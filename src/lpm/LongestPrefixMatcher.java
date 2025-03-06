@@ -1,44 +1,52 @@
 /**
  * LongestPrefixMatcher.java
- *
+ * <p>
  * Version: 2019-07-10
  * Copyright University of Twente, 2015-2025
- *
- **************************************************************************
- *                          = Copyright notice =                          *
- *                                                                        *
- *            This file may  ONLY  be distributed UNMODIFIED              *
+ * <p>
+ * *************************************************************************
+ * = Copyright notice =                          *
+ * *
+ * This file may  ONLY  be distributed UNMODIFIED              *
  * In particular, a correct solution to the challenge must  NOT be posted *
  * in public places, to preserve the learning effect for future students. *
- **************************************************************************
+ * *************************************************************************
  */
 
 package lpm;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 public class LongestPrefixMatcher {
-  /**
-   * You can use this function to initialize variables.
-   */
+    /**
+     * You can use this function to initialize variables.
+     */
+    //        int mask = 0xFFFFFFFF << (32 - prefixLength);
+    private int[] ips;
+    private int[] masks;
+    private int[] portNumbers;
+    private int index;
+
     public LongestPrefixMatcher() {
-        
+        ips = new int[420972];
+        masks = new int[420972];
+        portNumbers = new int[420972];
+        index = 0;
     }
-    
+
     /**
      * Looks up an IP address in the routing tables.
      * @param ip The IP address to be looked up in integer representation
      * @return The port number this IP maps to
      */
-    public int lookup(int ip) throws IOException {
+    public int lookup(int ip) {
         // TODO: Look up this route
-
-        try(BufferedReader br = new BufferedReader(new FileReader("routes.txt"))){
-
+        for (int i = 420971; i >= 0 ; i--) {
+            if ((ip & masks[i]) == ips[i]) {
+//                System.out.println(ipToHuman(ips[i]));
+//                System.out.println(ips[i]);
+                return portNumbers[i];
+            }
         }
+//        System.out.println(-1);
         return -1;
     }
 
@@ -51,7 +59,12 @@ public class LongestPrefixMatcher {
      */
     public void addRoute(int ip, byte prefixLength, int portNumber) {
         // TODO: Store this route for later use in lookup() method
-
+        //If they are the same, choose the one with the largest prefix
+        //add an if the previous is the same IP, check for the prefix and if greater change either way just continue.
+        ips[index] = ip;
+        masks[index] = 0xFFFFFFFF << (32 - prefixLength);
+        portNumbers[index] = portNumber;
+        index++;
     }
 
     /**
@@ -60,7 +73,6 @@ public class LongestPrefixMatcher {
      * organize the routing information, if your datastructure requires this.
      */
     public void finalizeRoutes() {
-        // TODO: Optionally do something     
     }
 
     /**
@@ -69,10 +81,8 @@ public class LongestPrefixMatcher {
      * @return The String representation for the IP (as xxx.xxx.xxx.xxx)
      */
     private String ipToHuman(int ip) {
-        return Integer.toString(ip >> 24 & 0xff) + "." +
-                Integer.toString(ip >> 16 & 0xff) + "." +
-                Integer.toString(ip >> 8 & 0xff) + "." +
-                Integer.toString(ip & 0xff);
+        return Integer.toString(ip >> 24 & 0xff) + "." + Integer.toString(ip >> 16 & 0xff) + "." +
+                Integer.toString(ip >> 8 & 0xff) + "." + Integer.toString(ip & 0xff);
     }
 
     /**

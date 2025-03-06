@@ -29,7 +29,6 @@ public class Framework {
 
     public static void main(String[] args) {
         Framework client = new Framework();
-        
         client.readRoutes(ROUTES_FILE);
         
         if (client.readLookup(LOOKUP_FILE, OUTPUT_FILE)) {
